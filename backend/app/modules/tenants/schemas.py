@@ -11,6 +11,7 @@ class BrandingConfig(BaseModel):
 
 class TenantConfig(BaseModel):
     whatsapp_number: Optional[str] = None
+    whatsapp_phone_number_id: Optional[str] = None
     whatsapp_api_key: Optional[str] = None
     razorpay_key_id: Optional[str] = None
     razorpay_key_secret: Optional[str] = None

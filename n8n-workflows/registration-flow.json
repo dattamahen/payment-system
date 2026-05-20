@@ -56,6 +56,9 @@
       "parameters": {
         "method": "POST",
         "url": "=http://127.0.0.1:8000/api/v1/n8n/session/message",
+        "options": {
+          "allowUnauthorizedCerts": false
+        },
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [

@@ -19,6 +19,8 @@ export class CreateTenantPage {
       razorpay_key_id: '',
       razorpay_key_secret: '',
       whatsapp_number: '',
+      whatsapp_phone_number_id: '',
+      whatsapp_api_key: '',
       google_sheets_credentials: '',
     }
   };
@@ -38,6 +40,8 @@ export class CreateTenantPage {
     if (payload.config.razorpay_key_id) config.razorpay_key_id = payload.config.razorpay_key_id;
     if (payload.config.razorpay_key_secret) config.razorpay_key_secret = payload.config.razorpay_key_secret;
     if (payload.config.whatsapp_number) config.whatsapp_number = payload.config.whatsapp_number;
+    if (payload.config.whatsapp_phone_number_id) config.whatsapp_phone_number_id = payload.config.whatsapp_phone_number_id;
+    if (payload.config.whatsapp_api_key) config.whatsapp_api_key = payload.config.whatsapp_api_key;
     if (payload.config.google_sheets_credentials) config.google_sheets_credentials = payload.config.google_sheets_credentials;
     payload.config = Object.keys(config).length ? config : undefined;
 

@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     REDIS_ENABLED: bool = False
 
     # CORS
-    ALLOWED_ORIGINS: list = ["http://localhost:4200", "https://your-domain.com"]
+    ALLOWED_ORIGINS: list = ["http://localhost:4200"]
 
     # JWT
     JWT_SECRET: str = "change-me-in-production"
@@ -38,6 +38,10 @@ class Settings(BaseSettings):
 
     # Encryption key for tenant secrets
     ENCRYPTION_KEY: str = "32-byte-key-for-fernet-encryption"
+
+    # Admin (first boot)
+    ADMIN_EMAIL: str = "admin@eventpay.com"
+    ADMIN_PASSWORD: str = "admin123"
 
     class Config:
         env_file = ".env"

@@ -25,11 +25,11 @@ settings = get_settings()
 
 async def seed_admin():
     db = Database.get_db()
-    existing = await db.users.find_one({"email": "admin@eventpay.com", "role": "super_admin"})
+    existing = await db.users.find_one({"email": settings.ADMIN_EMAIL, "role": "super_admin"})
     if not existing:
         await db.users.insert_one({
-            "email": "admin@eventpay.com",
-            "password_hash": hash_password("admin123"),
+            "email": settings.ADMIN_EMAIL,
+            "password_hash": hash_password(settings.ADMIN_PASSWORD),
             "name": "Super Admin",
             "role": "super_admin",
             "tenant_id": None,

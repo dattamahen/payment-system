@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonItem, IonInput, IonLabel, IonList, IonSelect, IonSelectOption, IonBadge, IonButtons } from '@ionic/angular/standalone';
+import { ViewWillEnter } from '@ionic/angular/standalone';
 import { ApiService } from '../../../core/services/api.service';
 import { AuthService } from '../../../core/services/auth.service';
 
@@ -13,7 +14,7 @@ import { AuthService } from '../../../core/services/auth.service';
   templateUrl: './tenants.page.html',
   styleUrls: ['./tenants.page.scss'],
 })
-export class TenantsPage implements OnInit {
+export class TenantsPage implements OnInit, ViewWillEnter {
   view: 'list' | 'events' | 'event-detail' = 'list';
   tenants: any[] = [];
   selectedTenant: any = null;
@@ -26,6 +27,8 @@ export class TenantsPage implements OnInit {
   constructor(private api: ApiService, private auth: AuthService, private router: Router) {}
 
   ngOnInit() { this.loadTenants(); }
+
+  ionViewWillEnter() { this.loadTenants(); }
 
   getTitle(): string {
     if (this.view === 'event-detail') return this.eventDetail?.name || 'Event Detail';

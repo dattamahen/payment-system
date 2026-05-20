@@ -30,9 +30,12 @@
       </ion-card>
 
       <ion-card>
-        <ion-card-header><ion-card-title>WhatsApp Config</ion-card-title></ion-card-header>
+        <ion-card-header><ion-card-title>WhatsApp Config *</ion-card-title></ion-card-header>
         <ion-card-content>
-          <ion-item><ion-input label="WhatsApp Number" labelPlacement="stacked" [(ngModel)]="tenant.config.whatsapp_number" placeholder="+919876543210"></ion-input></ion-item>
+          <p class="config-hint">Required. Get these from Meta Developer Portal → WhatsApp → API Setup.</p>
+          <ion-item><ion-input label="WhatsApp Display Number" labelPlacement="stacked" [(ngModel)]="tenant.config.whatsapp_number" placeholder="+919876543210"></ion-input></ion-item>
+          <ion-item><ion-input label="Phone Number ID *" labelPlacement="stacked" [(ngModel)]="tenant.config.whatsapp_phone_number_id" placeholder="107326073254xxxx"></ion-input></ion-item>
+          <ion-item><ion-input label="Access Token *" labelPlacement="stacked" type="password" [(ngModel)]="tenant.config.whatsapp_api_key" placeholder="Permanent token from System User"></ion-input></ion-item>
         </ion-card-content>
       </ion-card>
 
@@ -46,7 +49,7 @@
 
     </div>
 
-    <ion-button expand="block" class="ion-margin-top" (click)="create()" [disabled]="!tenant.name || !tenant.slug || !tenant.owner_email || !tenant.owner_password">Create Tenant</ion-button>
+    <ion-button expand="block" class="ion-margin-top" (click)="create()" [disabled]="!tenant.name || !tenant.slug || !tenant.owner_email || !tenant.owner_password || !tenant.config.whatsapp_phone_number_id || !tenant.config.whatsapp_api_key">Create Tenant</ion-button>
     <p *ngIf="msg" class="msg" [class.error]="err">{{ msg }}</p>
   </div>
 </ion-content>

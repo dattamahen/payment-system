@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonButton, IonBadge, IonButtons } from '@ionic/angular/standalone';
+import { ViewWillEnter } from '@ionic/angular/standalone';
 import { ApiService } from '../../core/services/api.service';
 import { AuthService } from '../../core/services/auth.service';
 
@@ -12,7 +13,7 @@ import { AuthService } from '../../core/services/auth.service';
   templateUrl: './events.page.html',
   styleUrls: ['./events.page.scss'],
 })
-export class EventsPage implements OnInit {
+export class EventsPage implements OnInit, ViewWillEnter {
   events: any[] = [];
   selectedEvent: any = null;
   registrations: any[] = [];
@@ -20,6 +21,8 @@ export class EventsPage implements OnInit {
   constructor(private api: ApiService, private auth: AuthService, private router: Router) {}
 
   ngOnInit() { this.loadEvents(); }
+
+  ionViewWillEnter() { this.loadEvents(); }
 
   loadEvents() {
     this.api.getEvents().subscribe({ next: (e) => this.events = e, error: () => {} });
