@@ -1,0 +1,46 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="transparent">
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <div class="login-wrapper">
+    <div class="login-bg">
+      <div class="bg-pattern"></div>
+      <div class="bg-overlay"></div>
+      <div class="bg-content">
+        <h1>EventPay</h1>
+        <p>Seamless event registrations & payments via WhatsApp</p>
+        <div class="features">
+          <div class="feature-item">📋 Create Events & Forms</div>
+          <div class="feature-item">💬 Collect Responses via WhatsApp</div>
+          <div class="feature-item">💳 Integrated Razorpay Payments</div>
+          <div class="feature-item">📊 Auto-sync to Google Sheets</div>
+        </div>
+      </div>
+    </div>
+    <div class="login-form-section">
+      <div class="bg-pattern mobile-pattern"></div>
+      <div class="login-form-inner">
+        <div class="brand-mobile">
+          <h2>EventPay</h2>
+          <p>Event registrations & payments</p>
+        </div>
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Sign In</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-item>
+              <ion-input label="Email" labelPlacement="stacked" type="email" [(ngModel)]="email" placeholder="you@company.com" autocomplete="off"></ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-input label="Password" labelPlacement="stacked" type="password" [(ngModel)]="password" placeholder="••••••••" autocomplete="off"></ion-input>
+            </ion-item>
+            <ion-button expand="block" (click)="login()" class="ion-margin-top" [disabled]="!email || !password">Login</ion-button>
+            <p *ngIf="error" class="error-msg">{{ error }}</p>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </div>
+  </div>
+</ion-content>

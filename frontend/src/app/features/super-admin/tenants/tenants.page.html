@@ -1,0 +1,203 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start" *ngIf="view !== 'list'">
+      <ion-button (click)="goBack()">← Back</ion-button>
+    </ion-buttons>
+    <ion-title>{{ getTitle() }}</ion-title>
+    <ion-buttons slot="end" *ngIf="view === 'list'">
+      <ion-button (click)="goToCreate()">+ New Tenant</ion-button>
+      <ion-button (click)="logout()">Logout</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+  <div class="page-container">
+
+    <!-- TENANT LIST -->
+    <ng-container *ngIf="view === 'list'">
+
+      <!-- Desktop -->
+      <div class="desktop-table">
+        <div class="data-table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let t of tenants; let i = index">
+                <td>{{ i + 1 }}</td>
+                <td>{{ t.name }}</td>
+                <td><ion-badge [color]="t.status === 'active' ? 'success' : 'danger'">{{ t.status }}</ion-badge></td>
+                <td class="actions-cell">
+                  <ion-button fill="clear" size="small" (click)="viewTenantEvents(t)">Events</ion-button>
+                  <ion-button fill="clear" size="small" (click)="selectTenantForUser(t)">Add User</ion-button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Mobile -->
+      <div class="mobile-cards">
+        <div class="mobile-card" *ngFor="let t of tenants">
+          <div class="mobile-card-header">
+            <h3>{{ t.name }}</h3>
+            <ion-badge [color]="t.status === 'active' ? 'success' : 'danger'">{{ t.status }}</ion-badge>
+          </div>
+          <div class="mobile-card-actions">
+            <ion-button fill="outline" size="small" (click)="viewTenantEvents(t)">Events</ion-button>
+            <ion-button fill="outline" size="small" (click)="selectTenantForUser(t)">Add User</ion-button>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="tenants.length === 0" class="empty-state"><p>No tenants yet.</p></div>
+
+      <!-- Add User -->
+      <ion-card *ngIf="selectedTenantForUser" class="user-form-card">
+        <ion-card-header><ion-card-title>Add User to: {{ selectedTenantForUser.name }}</ion-card-title></ion-card-header>
+        <ion-card-content>
+          <ion-item><ion-input label="Name" labelPlacement="stacked" [(ngModel)]="newUser.name"></ion-input></ion-item>
+          <ion-item><ion-input label="Email" labelPlacement="stacked" [(ngModel)]="newUser.email"></ion-input></ion-item>
+          <ion-item><ion-input label="Password" labelPlacement="stacked" type="password" [(ngModel)]="newUser.password"></ion-input></ion-item>
+          <ion-item>
+            <ion-select label="Role" labelPlacement="stacked" [(ngModel)]="newUser.role">
+              <ion-select-option value="tenant_admin">Tenant Admin</ion-select-option>
+              <ion-select-option value="tenant_user">Tenant User</ion-select-option>
+            </ion-select>
+          </ion-item>
+          <ion-button expand="block" class="ion-margin-top" (click)="createUser()">Create User</ion-button>
+          <ion-button expand="block" fill="clear" (click)="selectedTenantForUser = null">Cancel</ion-button>
+          <p *ngIf="userMsg" class="success-msg">{{ userMsg }}</p>
+        </ion-card-content>
+      </ion-card>
+    </ng-container>
+
+    <!-- TENANT EVENTS -->
+    <ng-container *ngIf="view === 'events'">
+
+      <!-- Desktop -->
+      <div class="desktop-table">
+        <div class="data-table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Event Name</th>
+                <th>Registrations</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let e of tenantEvents; let i = index">
+                <td>{{ i + 1 }}</td>
+                <td>{{ e.name }}</td>
+                <td>{{ e.registrations_count || 0 }}</td>
+                <td><ion-badge [color]="getEventStatusColor(e.status)">{{ e.status }}</ion-badge></td>
+                <td class="actions-cell">
+                  <ion-button *ngIf="e.status !== 'active'" fill="clear" size="small" color="success" (click)="changeEventStatus(e.id, 'active')">Start</ion-button>
+                  <ion-button *ngIf="e.status === 'active'" fill="clear" size="small" color="warning" (click)="changeEventStatus(e.id, 'paused')">Pause</ion-button>
+                  <ion-button *ngIf="e.status !== 'stopped'" fill="clear" size="small" color="danger" (click)="changeEventStatus(e.id, 'stopped')">Stop</ion-button>
+                  <ion-button fill="clear" size="small" (click)="viewEventDetail(e)">Details</ion-button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Mobile -->
+      <div class="mobile-cards">
+        <div class="mobile-card" *ngFor="let e of tenantEvents">
+          <div class="mobile-card-header">
+            <h3>{{ e.name }}</h3>
+            <ion-badge [color]="getEventStatusColor(e.status)">{{ e.status }}</ion-badge>
+          </div>
+          <div class="mobile-card-meta">Registrations: {{ e.registrations_count || 0 }}</div>
+          <div class="mobile-card-actions">
+            <ion-button *ngIf="e.status !== 'active'" fill="outline" size="small" color="success" (click)="changeEventStatus(e.id, 'active')">Start</ion-button>
+            <ion-button *ngIf="e.status === 'active'" fill="outline" size="small" color="warning" (click)="changeEventStatus(e.id, 'paused')">Pause</ion-button>
+            <ion-button *ngIf="e.status !== 'stopped'" fill="outline" size="small" color="danger" (click)="changeEventStatus(e.id, 'stopped')">Stop</ion-button>
+            <ion-button fill="outline" size="small" (click)="viewEventDetail(e)">Details</ion-button>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="tenantEvents.length === 0" class="empty-state"><p>No events for this tenant.</p></div>
+    </ng-container>
+
+    <!-- EVENT DETAIL -->
+    <ng-container *ngIf="view === 'event-detail' && eventDetail">
+      <div class="detail-grid">
+        <ion-card>
+          <ion-card-header><ion-card-title>Event Info</ion-card-title></ion-card-header>
+          <ion-card-content>
+            <div class="detail-row"><span class="detail-label">Status</span><ion-badge [color]="getEventStatusColor(eventDetail.status)">{{ eventDetail.status }}</ion-badge></div>
+            <div class="detail-row"><span class="detail-label">Description</span><span>{{ eventDetail.description || 'N/A' }}</span></div>
+            <div class="detail-row"><span class="detail-label">Event Date</span><span>{{ eventDetail.event_date | date:'medium' }}</span></div>
+            <div class="detail-row"><span class="detail-label">Deadline</span><span>{{ eventDetail.registration_deadline ? (eventDetail.registration_deadline | date:'medium') : 'N/A' }}</span></div>
+            <div class="detail-row"><span class="detail-label">Max Participants</span><span>{{ eventDetail.max_participants }}</span></div>
+            <div class="detail-row"><span class="detail-label">Pricing</span><span>{{ eventDetail.pricing?.type === 'paid' ? '₹' + eventDetail.pricing.amount : 'Free' }}</span></div>
+          </ion-card-content>
+        </ion-card>
+
+        <ion-card *ngIf="eventDetail.venue">
+          <ion-card-header><ion-card-title>Venue</ion-card-title></ion-card-header>
+          <ion-card-content>
+            <div class="detail-row"><span class="detail-label">Name</span><span>{{ eventDetail.venue.name }}</span></div>
+            <div class="detail-row"><span class="detail-label">Address</span><span>{{ eventDetail.venue.address }}</span></div>
+            <div class="detail-row"><span class="detail-label">City</span><span>{{ eventDetail.venue.city }}</span></div>
+          </ion-card-content>
+        </ion-card>
+      </div>
+
+      <ion-card *ngIf="eventDetail.form_fields?.length">
+        <ion-card-header><ion-card-title>Registration Questions</ion-card-title></ion-card-header>
+        <ion-card-content>
+          <div *ngFor="let f of eventDetail.form_fields; let i = index" class="question-item">
+            <span class="q-num">{{ i + 1 }}.</span> {{ f.label }}
+            <ion-badge color="medium">{{ f.type }}</ion-badge>
+            <ion-badge *ngIf="f.required" color="primary">Required</ion-badge>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card>
+        <ion-card-header><ion-card-title>Registrations ({{ eventDetail.registrations_count }})</ion-card-title></ion-card-header>
+        <ion-card-content>
+          <div class="data-table-wrap" *ngIf="eventDetail.registrations?.length">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Contact</th>
+                  <th>Status</th>
+                  <th>Payment</th>
+                  <th>Responses</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let r of eventDetail.registrations; let i = index">
+                  <td>{{ i + 1 }}</td>
+                  <td>{{ r.phone || '-' }}</td>
+                  <td>{{ r.status }}</td>
+                  <td>{{ r.payment?.status || 'N/A' }}</td>
+                  <td class="responses-cell">{{ formatResponses(r.responses) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div *ngIf="!eventDetail.registrations?.length" class="empty-state"><p>No registrations yet.</p></div>
+        </ion-card-content>
+      </ion-card>
+    </ng-container>
+
+  </div>
+</ion-content>

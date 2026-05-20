@@ -1,0 +1,100 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start" *ngIf="selectedEvent">
+      <ion-button (click)="selectedEvent = null">← Back</ion-button>
+    </ion-buttons>
+    <ion-title>{{ selectedEvent ? selectedEvent.name + ' - Registrations' : 'Events' }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button *ngIf="!selectedEvent" (click)="goToCreate()">+ New Event</ion-button>
+      <ion-button (click)="logout()">Logout</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+  <div class="page-container">
+
+    <!-- EVENTS LIST -->
+    <ng-container *ngIf="!selectedEvent">
+      <!-- Desktop Table -->
+      <div class="desktop-table">
+        <div class="data-table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Event Name</th>
+                <th>Registrations</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let e of events; let i = index">
+                <td>{{ i + 1 }}</td>
+                <td>{{ e.name }}</td>
+                <td>{{ e.registrations_count || 0 }}</td>
+                <td><ion-badge [color]="getStatusColor(e.status)">{{ e.status }}</ion-badge></td>
+                <td class="actions-cell">
+                  <ion-button *ngIf="e.status !== 'active'" fill="clear" size="small" color="success" (click)="changeStatus(e.id, 'active')">Start</ion-button>
+                  <ion-button *ngIf="e.status === 'active'" fill="clear" size="small" color="warning" (click)="changeStatus(e.id, 'paused')">Pause</ion-button>
+                  <ion-button *ngIf="e.status !== 'stopped'" fill="clear" size="small" color="danger" (click)="changeStatus(e.id, 'stopped')">Stop</ion-button>
+                  <ion-button fill="clear" size="small" (click)="viewRegistrations(e)">View</ion-button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Mobile Cards -->
+      <div class="mobile-cards">
+        <div class="mobile-card" *ngFor="let e of events">
+          <div class="mobile-card-header">
+            <h3>{{ e.name }}</h3>
+            <ion-badge [color]="getStatusColor(e.status)">{{ e.status }}</ion-badge>
+          </div>
+          <div class="mobile-card-meta">Registrations: {{ e.registrations_count || 0 }}</div>
+          <div class="mobile-card-actions">
+            <ion-button *ngIf="e.status !== 'active'" fill="outline" size="small" color="success" (click)="changeStatus(e.id, 'active')">Start</ion-button>
+            <ion-button *ngIf="e.status === 'active'" fill="outline" size="small" color="warning" (click)="changeStatus(e.id, 'paused')">Pause</ion-button>
+            <ion-button *ngIf="e.status !== 'stopped'" fill="outline" size="small" color="danger" (click)="changeStatus(e.id, 'stopped')">Stop</ion-button>
+            <ion-button fill="outline" size="small" (click)="viewRegistrations(e)">View</ion-button>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="events.length === 0" class="empty-state">
+        <p>No events yet. Create one to get started.</p>
+      </div>
+    </ng-container>
+
+    <!-- REGISTRATIONS VIEW -->
+    <ng-container *ngIf="selectedEvent">
+      <ion-button fill="outline" size="small" (click)="downloadPdf()">Download PDF</ion-button>
+      <div class="data-table-wrap" style="margin-top: 12px;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th *ngFor="let f of selectedEvent.form_fields">{{ f.label }}</th>
+              <th>Status</th>
+              <th>Registered At</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let r of registrations; let i = index">
+              <td>{{ i + 1 }}</td>
+              <td *ngFor="let f of selectedEvent.form_fields">{{ r.responses[f.label] || '-' }}</td>
+              <td><ion-badge [color]="r.status === 'completed' ? 'success' : 'warning'">{{ r.status }}</ion-badge></td>
+              <td>{{ r.created_at | date:'short' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div *ngIf="registrations.length === 0" class="empty-state">
+        <p>No registrations yet.</p>
+      </div>
+    </ng-container>
+
+  </div>
+</ion-content>

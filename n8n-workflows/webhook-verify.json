@@ -1,0 +1,48 @@
+{
+  "name": "EventPay - WhatsApp Webhook Verify",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "whatsapp-webhook",
+        "responseMode": "responseNode"
+      },
+      "id": "verify-trigger",
+      "name": "Verify Webhook (GET)",
+      "type": "n8n-nodes-base.webhook",
+      "position": [200, 300],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "jsCode": "// WhatsApp verification - return hub.challenge\nconst query = $input.first().json.query;\nconst mode = query['hub.mode'];\nconst token = query['hub.verify_token'];\nconst challenge = query['hub.challenge'];\n\nif (mode === 'subscribe' && token === 'eventpay-verify-token') {\n  return [{ json: { challenge } }];\n}\nreturn [{ json: { error: 'Verification failed' } }];"
+      },
+      "id": "verify-logic",
+      "name": "Verify Token",
+      "type": "n8n-nodes-base.code",
+      "position": [400, 300],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.challenge }}"
+      },
+      "id": "respond-challenge",
+      "name": "Return Challenge",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [600, 300],
+      "typeVersion": 1
+    }
+  ],
+  "connections": {
+    "Verify Webhook (GET)": {
+      "main": [[{ "node": "Verify Token", "type": "main", "index": 0 }]]
+    },
+    "Verify Token": {
+      "main": [[{ "node": "Return Challenge", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": { "executionOrder": "v1" },
+  "tags": [{ "name": "EventPay" }]
+}

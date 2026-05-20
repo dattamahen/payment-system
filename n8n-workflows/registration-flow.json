@@ -1,0 +1,100 @@
+{
+  "name": "EventPay - Dynamic Registration (All Tenants)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "whatsapp-webhook",
+        "responseMode": "responseNode"
+      },
+      "id": "webhook-trigger",
+      "name": "WhatsApp Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "position": [200, 300],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\"status\": \"ok\"}"
+      },
+      "id": "respond-ok",
+      "name": "Respond OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [400, 200],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract message from WhatsApp Cloud API payload\nconst body = $input.first().json.body;\ntry {\n  const entry = body.entry[0];\n  const changes = entry.changes[0];\n  const value = changes.value;\n  \n  // Skip status updates (delivered, read, etc.)\n  if (!value.messages || !value.messages.length) {\n    return [{ json: { skip: true } }];\n  }\n  \n  const message = value.messages[0];\n  return [{\n    json: {\n      phone: message.from,\n      text: message.text?.body || '',\n      wa_phone_number_id: value.metadata.phone_number_id,\n      wa_number: value.metadata.phone_number_id\n    }\n  }];\n} catch(e) {\n  return [{ json: { skip: true } }];\n}"
+      },
+      "id": "parse-message",
+      "name": "Parse Message",
+      "type": "n8n-nodes-base.code",
+      "position": [400, 400],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "conditions": [
+            {
+              "leftValue": "={{ $json.phone }}",
+              "rightValue": "",
+              "operator": { "type": "string", "operation": "notEmpty" }
+            }
+          ]
+        }
+      },
+      "id": "check-valid",
+      "name": "Filter Valid",
+      "type": "n8n-nodes-base.if",
+      "position": [600, 400],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://127.0.0.1:8000/api/v1/n8n/session/message",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "x-api-key", "value": "eventpay-n8n-secret-2024" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"phone\": \"{{ $json.phone }}\",\n  \"text\": \"{{ $json.text }}\",\n  \"wa_number\": \"{{ $json.wa_number }}\"\n}"
+      },
+      "id": "handle-message",
+      "name": "Handle Message (Backend)",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [800, 400],
+      "typeVersion": 4.2
+    }
+  ],
+  "connections": {
+    "WhatsApp Webhook": {
+      "main": [
+        [
+          { "node": "Respond OK", "type": "main", "index": 0 },
+          { "node": "Parse Message", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Parse Message": {
+      "main": [[{ "node": "Filter Valid", "type": "main", "index": 0 }]]
+    },
+    "Filter Valid": {
+      "main": [
+        [{ "node": "Handle Message (Backend)", "type": "main", "index": 0 }],
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [{ "name": "EventPay" }]
+}

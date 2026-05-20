@@ -1,0 +1,95 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-button (click)="goBack()">← Back</ion-button>
+    </ion-buttons>
+    <ion-title>Create Event</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+  <div class="page-container">
+    <div class="form-grid">
+
+      <!-- Event Details -->
+      <ion-card class="form-full">
+        <ion-card-header><ion-card-title>Event Details</ion-card-title></ion-card-header>
+        <ion-card-content>
+          <ion-item><ion-input label="Event Name" labelPlacement="stacked" [(ngModel)]="event.name" placeholder="Annual Conference 2025"></ion-input></ion-item>
+          <ion-item><ion-input label="Slug" labelPlacement="stacked" [(ngModel)]="event.slug" placeholder="annual-conf-2025"></ion-input></ion-item>
+          <ion-item><ion-textarea label="Description" labelPlacement="stacked" [(ngModel)]="event.description" placeholder="Brief description of the event..." rows="3"></ion-textarea></ion-item>
+          <div class="input-row">
+            <ion-item><ion-input label="Event Date" labelPlacement="stacked" type="datetime-local" [(ngModel)]="event.event_date"></ion-input></ion-item>
+            <ion-item><ion-input label="Registration Deadline" labelPlacement="stacked" type="datetime-local" [(ngModel)]="event.registration_deadline"></ion-input></ion-item>
+          </div>
+          <ion-item><ion-input label="Max Participants" labelPlacement="stacked" type="number" [(ngModel)]="event.max_participants"></ion-input></ion-item>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Venue -->
+      <ion-card>
+        <ion-card-header><ion-card-title>Venue</ion-card-title></ion-card-header>
+        <ion-card-content>
+          <ion-item><ion-input label="Venue Name" labelPlacement="stacked" [(ngModel)]="event.venue.name" placeholder="Convention Center"></ion-input></ion-item>
+          <ion-item><ion-input label="Address" labelPlacement="stacked" [(ngModel)]="event.venue.address" placeholder="123 Main St"></ion-input></ion-item>
+          <ion-item><ion-input label="City" labelPlacement="stacked" [(ngModel)]="event.venue.city" placeholder="Bangalore"></ion-input></ion-item>
+          <ion-item><ion-input label="Map URL" labelPlacement="stacked" [(ngModel)]="event.venue.map_url" placeholder="https://maps.google.com/..."></ion-input></ion-item>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Pricing -->
+      <ion-card>
+        <ion-card-header><ion-card-title>Registration Fees</ion-card-title></ion-card-header>
+        <ion-card-content>
+          <ion-item>
+            <ion-select label="Pricing Type" labelPlacement="stacked" [(ngModel)]="event.pricing.type">
+              <ion-select-option value="free">Free</ion-select-option>
+              <ion-select-option value="paid">Paid</ion-select-option>
+            </ion-select>
+          </ion-item>
+          <ion-item *ngIf="event.pricing.type === 'paid'">
+            <ion-input label="Amount (₹)" labelPlacement="stacked" type="number" [(ngModel)]="event.pricing.amount" placeholder="500"></ion-input>
+          </ion-item>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Questions -->
+      <ion-card class="form-full">
+        <ion-card-header><ion-card-title>Registration Questions</ion-card-title></ion-card-header>
+        <ion-card-content>
+          <div *ngFor="let field of event.form_fields; let i = index" class="field-block">
+            <div class="field-header">
+              <span class="field-num">Q{{ i + 1 }}</span>
+              <ion-button fill="clear" color="danger" size="small" (click)="removeField(i)">Remove</ion-button>
+            </div>
+            <ion-item><ion-input label="Question" labelPlacement="stacked" [(ngModel)]="field.label" placeholder="e.g. Full Name"></ion-input></ion-item>
+            <div class="field-row">
+              <ion-item>
+                <ion-select label="Type" labelPlacement="stacked" [(ngModel)]="field.type">
+                  <ion-select-option value="text">Text</ion-select-option>
+                  <ion-select-option value="email">Email</ion-select-option>
+                  <ion-select-option value="phone">Phone</ion-select-option>
+                  <ion-select-option value="number">Number</ion-select-option>
+                  <ion-select-option value="select">Dropdown</ion-select-option>
+                </ion-select>
+              </ion-item>
+              <ion-item>
+                <ion-select label="Required" labelPlacement="stacked" [(ngModel)]="field.required">
+                  <ion-select-option [value]="true">Yes</ion-select-option>
+                  <ion-select-option [value]="false">No</ion-select-option>
+                </ion-select>
+              </ion-item>
+            </div>
+            <ion-item *ngIf="field.type === 'select'">
+              <ion-input label="Options (comma separated)" labelPlacement="stacked" [(ngModel)]="field.optionsStr" placeholder="Option 1, Option 2, Option 3"></ion-input>
+            </ion-item>
+          </div>
+          <ion-button fill="outline" size="small" (click)="addField()" class="ion-margin-top">+ Add Question</ion-button>
+        </ion-card-content>
+      </ion-card>
+
+    </div>
+
+    <ion-button expand="block" (click)="createEvent()" class="submit-btn" [disabled]="!event.name || !event.slug || !event.event_date">Create Event</ion-button>
+    <p *ngIf="msg" class="msg" [class.error]="err">{{ msg }}</p>
+  </div>
+</ion-content>

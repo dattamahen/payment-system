@@ -1,0 +1,168 @@
+{
+  "name": "EventPay - Payment Confirmation (All Tenants)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "whatsapp-webhook",
+        "responseMode": "responseNode"
+      },
+      "id": "verify-trigger",
+      "name": "Verify Webhook (GET)",
+      "type": "n8n-nodes-base.webhook",
+      "position": [200, 100],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "jsCode": "const query = $input.first().json.query;\nconst mode = query['hub.mode'];\nconst token = query['hub.verify_token'];\nconst challenge = query['hub.challenge'];\nif (mode === 'subscribe' && token === 'eventpay-verify') {\n  return [{ json: { challenge } }];\n}\nreturn [{ json: { error: 'failed' } }];"
+      },
+      "id": "verify-logic",
+      "name": "Verify Token",
+      "type": "n8n-nodes-base.code",
+      "position": [400, 100],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.challenge }}"
+      },
+      "id": "respond-challenge",
+      "name": "Return Challenge",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [600, 100],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "whatsapp-webhook",
+        "responseMode": "responseNode"
+      },
+      "id": "webhook-trigger",
+      "name": "WhatsApp Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "position": [200, 350],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\"status\":\"ok\"}"
+      },
+      "id": "respond-ok",
+      "name": "Respond OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [400, 250],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body;\ntry {\n  const entry = body.entry[0];\n  const changes = entry.changes[0];\n  const value = changes.value;\n  if (!value.messages || !value.messages.length) {\n    return [{ json: { skip: true } }];\n  }\n  const message = value.messages[0];\n  return [{\n    json: {\n      phone: message.from,\n      text: message.text?.body || '',\n      wa_phone_number_id: value.metadata.phone_number_id,\n      wa_number: value.metadata.display_phone_number || value.metadata.phone_number_id\n    }\n  }];\n} catch(e) {\n  return [{ json: { skip: true } }];\n}"
+      },
+      "id": "parse-message",
+      "name": "Parse Message",
+      "type": "n8n-nodes-base.code",
+      "position": [400, 450],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\nif (!data.phone || data.skip) {\n  return [];\n}\nreturn [$input.first()];"
+      },
+      "id": "filter-valid",
+      "name": "Filter Valid",
+      "type": "n8n-nodes-base.code",
+      "position": [600, 450],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "jsCode": "const phone = $input.first().json.phone;\nconst text = $input.first().json.text;\nconst wa_number = $input.first().json.wa_number;\n\nconst response = await this.helpers.httpRequest({\n  method: 'POST',\n  url: 'http://127.0.0.1:8000/api/v1/n8n/session/message',\n  headers: {\n    'Content-Type': 'application/json',\n    'x-api-key': 'eventpay-n8n-secret-2024'\n  },\n  body: { phone, text, wa_number }\n});\n\nreturn [{ json: { ...response, phone } }];"
+      },
+      "id": "handle-message",
+      "name": "Handle Message (Backend)",
+      "type": "n8n-nodes-base.code",
+      "position": [800, 450],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\nif (data.action !== 'reply' || !data.message) {\n  return [];\n}\n\nconst phone = data.phone;\nconst message = data.message;\n\nconst response = await this.helpers.httpRequest({\n  method: 'POST',\n  url: 'https://graph.facebook.com/v18.0/1073260732545641/messages',\n  headers: {\n    'Authorization': 'Bearer PASTE_YOUR_TOKEN_HERE',\n    'Content-Type': 'application/json'\n  },\n  body: {\n    messaging_product: 'whatsapp',\n    to: phone,\n    type: 'text',\n    text: { body: message }\n  }\n});\n\nreturn [{ json: response }];"
+      },
+      "id": "send-reply",
+      "name": "Send WhatsApp Reply",
+      "type": "n8n-nodes-base.code",
+      "position": [1000, 450],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "payment-confirmed",
+        "responseMode": "lastNode"
+      },
+      "id": "payment-webhook",
+      "name": "Razorpay Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "position": [200, 700],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "jsCode": "const payload = $input.first().json.body;\nconst event = payload.event;\nlet notes = {};\nlet phone = '';\nlet amount = 0;\n\nif (event === 'payment_link.paid') {\n  const entity = payload.payload.payment_link.entity;\n  notes = entity.notes || {};\n  phone = entity.customer?.contact || '';\n  amount = entity.amount / 100;\n} else if (event === 'payment.captured') {\n  const entity = payload.payload.payment.entity;\n  notes = entity.notes || {};\n  phone = entity.contact || '';\n  amount = entity.amount / 100;\n} else {\n  return [];\n}\n\nif (!notes.tenant_id) return [];\n\nreturn [{ json: { tenant_id: notes.tenant_id, event_id: notes.event_id, registration_id: notes.registration_id, phone, amount } }];"
+      },
+      "id": "parse-payment",
+      "name": "Parse Payment",
+      "type": "n8n-nodes-base.code",
+      "position": [400, 700],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\n\nawait this.helpers.httpRequest({\n  method: 'POST',\n  url: 'http://127.0.0.1:8000/api/v1/n8n/' + data.tenant_id + '/events/' + data.event_id + '/sync-sheet',\n  headers: { 'x-api-key': 'eventpay-n8n-secret-2024' }\n});\n\nconst msg = 'Payment of Rs.' + data.amount + ' received! Your registration is confirmed. Thank you!';\n\nawait this.helpers.httpRequest({\n  method: 'POST',\n  url: 'https://graph.facebook.com/v18.0/1073260732545641/messages',\n  headers: {\n    'Authorization': 'Bearer PASTE_YOUR_TOKEN_HERE',\n    'Content-Type': 'application/json'\n  },\n  body: {\n    messaging_product: 'whatsapp',\n    to: data.phone,\n    type: 'text',\n    text: { body: msg }\n  }\n});\n\nreturn [{ json: { status: 'ok' } }];"
+      },
+      "id": "handle-payment",
+      "name": "Handle Payment & Notify",
+      "type": "n8n-nodes-base.code",
+      "position": [600, 700],
+      "typeVersion": 2
+    }
+  ],
+  "connections": {
+    "Verify Webhook (GET)": {
+      "main": [[{ "node": "Verify Token", "type": "main", "index": 0 }]]
+    },
+    "Verify Token": {
+      "main": [[{ "node": "Return Challenge", "type": "main", "index": 0 }]]
+    },
+    "WhatsApp Webhook": {
+      "main": [
+        [
+          { "node": "Respond OK", "type": "main", "index": 0 },
+          { "node": "Parse Message", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Parse Message": {
+      "main": [[{ "node": "Filter Valid", "type": "main", "index": 0 }]]
+    },
+    "Filter Valid": {
+      "main": [[{ "node": "Handle Message (Backend)", "type": "main", "index": 0 }]]
+    },
+    "Handle Message (Backend)": {
+      "main": [[{ "node": "Send WhatsApp Reply", "type": "main", "index": 0 }]]
+    },
+    "Razorpay Webhook": {
+      "main": [[{ "node": "Parse Payment", "type": "main", "index": 0 }]]
+    },
+    "Parse Payment": {
+      "main": [[{ "node": "Handle Payment & Notify", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [{ "name": "EventPay" }]
+}

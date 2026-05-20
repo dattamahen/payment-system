@@ -1,0 +1,52 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-button (click)="goBack()">← Back</ion-button>
+    </ion-buttons>
+    <ion-title>Create Tenant</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+  <div class="page-container">
+    <div class="form-grid">
+
+      <ion-card>
+        <ion-card-header><ion-card-title>Tenant Details</ion-card-title></ion-card-header>
+        <ion-card-content>
+          <ion-item><ion-input label="Name" labelPlacement="stacked" [(ngModel)]="tenant.name" placeholder="Acme Corp"></ion-input></ion-item>
+          <ion-item><ion-input label="Slug" labelPlacement="stacked" [(ngModel)]="tenant.slug" placeholder="acme-corp"></ion-input></ion-item>
+          <ion-item><ion-input label="Owner Email" labelPlacement="stacked" [(ngModel)]="tenant.owner_email" placeholder="owner@acme.com"></ion-input></ion-item>
+          <ion-item><ion-input label="Owner Password" labelPlacement="stacked" type="password" [(ngModel)]="tenant.owner_password"></ion-input></ion-item>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card>
+        <ion-card-header><ion-card-title>Payment Config (Razorpay)</ion-card-title></ion-card-header>
+        <ion-card-content>
+          <p class="config-hint">Tenant's Razorpay credentials. Money goes to the bank account linked in their Razorpay dashboard.</p>
+          <ion-item><ion-input label="Razorpay Key ID" labelPlacement="stacked" [(ngModel)]="tenant.config.razorpay_key_id" placeholder="rzp_live_xxxxxxxx"></ion-input></ion-item>
+          <ion-item><ion-input label="Razorpay Key Secret" labelPlacement="stacked" type="password" [(ngModel)]="tenant.config.razorpay_key_secret" placeholder="xxxxxxxxxxxxxxxx"></ion-input></ion-item>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card>
+        <ion-card-header><ion-card-title>WhatsApp Config</ion-card-title></ion-card-header>
+        <ion-card-content>
+          <ion-item><ion-input label="WhatsApp Number" labelPlacement="stacked" [(ngModel)]="tenant.config.whatsapp_number" placeholder="+919876543210"></ion-input></ion-item>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card>
+        <ion-card-header><ion-card-title>Google Sheets Config</ion-card-title></ion-card-header>
+        <ion-card-content>
+          <p class="config-hint">Service account JSON credentials for auto-syncing registrations.</p>
+          <ion-item><ion-textarea label="Service Account JSON" labelPlacement="stacked" [(ngModel)]="tenant.config.google_sheets_credentials" placeholder='{"type": "service_account", ...}' rows="4"></ion-textarea></ion-item>
+        </ion-card-content>
+      </ion-card>
+
+    </div>
+
+    <ion-button expand="block" class="ion-margin-top" (click)="create()" [disabled]="!tenant.name || !tenant.slug || !tenant.owner_email || !tenant.owner_password">Create Tenant</ion-button>
+    <p *ngIf="msg" class="msg" [class.error]="err">{{ msg }}</p>
+  </div>
+</ion-content>

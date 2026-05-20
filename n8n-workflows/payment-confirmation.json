@@ -1,0 +1,84 @@
+{
+  "name": "EventPay - Payment Confirmation (All Tenants)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "payment-confirmed",
+        "responseMode": "lastNode"
+      },
+      "id": "payment-webhook",
+      "name": "Razorpay Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "position": [200, 300],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "jsCode": "const payload = $input.first().json.body;\nconst event = payload.event;\n\nif (event === 'payment_link.paid') {\n  const entity = payload.payload.payment_link.entity;\n  const notes = entity.notes || {};\n  return [{\n    json: {\n      tenant_id: notes.tenant_id,\n      event_id: notes.event_id,\n      registration_id: notes.registration_id,\n      phone: entity.customer?.contact || '',\n      amount: entity.amount / 100,\n      status: 'paid'\n    }\n  }];\n}\n\nif (event === 'payment.captured') {\n  const entity = payload.payload.payment.entity;\n  const notes = entity.notes || {};\n  return [{\n    json: {\n      tenant_id: notes.tenant_id,\n      event_id: notes.event_id,\n      registration_id: notes.registration_id,\n      phone: entity.contact || '',\n      amount: entity.amount / 100,\n      status: 'paid'\n    }\n  }];\n}\n\nreturn [{ json: { skip: true } }];"
+      },
+      "id": "parse-payment",
+      "name": "Parse Payment",
+      "type": "n8n-nodes-base.code",
+      "position": [400, 300],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "conditions": [
+            {
+              "leftValue": "={{ $json.tenant_id }}",
+              "rightValue": "",
+              "operator": { "type": "string", "operation": "notEmpty" }
+            }
+          ]
+        }
+      },
+      "id": "is-valid",
+      "name": "Valid?",
+      "type": "n8n-nodes-base.if",
+      "position": [600, 300],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://127.0.0.1:8000/api/v1/n8n/{{ $json.tenant_id }}/events/{{ $json.event_id }}/payment-confirmed",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "x-api-key", "value": "eventpay-n8n-secret-2024" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"registration_id\": \"{{ $json.registration_id }}\",\n  \"phone\": \"{{ $json.phone }}\",\n  \"amount\": {{ $json.amount }},\n  \"status\": \"{{ $json.status }}\"\n}"
+      },
+      "id": "confirm-payment",
+      "name": "Confirm Payment (Backend)",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [800, 300],
+      "typeVersion": 4.2
+    }
+  ],
+  "connections": {
+    "Razorpay Webhook": {
+      "main": [[{ "node": "Parse Payment", "type": "main", "index": 0 }]]
+    },
+    "Parse Payment": {
+      "main": [[{ "node": "Valid?", "type": "main", "index": 0 }]]
+    },
+    "Valid?": {
+      "main": [
+        [{ "node": "Confirm Payment (Backend)", "type": "main", "index": 0 }],
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [{ "name": "EventPay" }]
+}

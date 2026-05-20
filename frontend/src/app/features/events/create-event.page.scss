@@ -1,0 +1,52 @@
+.input-row,
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+
+  @media (min-width: 768px) {
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+}
+
+.field-block {
+  border: 1px solid #e2e8f0;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.field-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.field-num {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+}
+
+.submit-btn {
+  margin-top: 16px;
+  --padding-top: 14px;
+  --padding-bottom: 14px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.msg {
+  text-align: center;
+  margin-top: 12px;
+  font-size: 14px;
+  color: #16a34a;
+
+  &.error {
+    color: #dc2626;
+  }
+}
