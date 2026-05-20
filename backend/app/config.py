@@ -40,8 +40,8 @@ class Settings(BaseSettings):
     ENCRYPTION_KEY: str = "32-byte-key-for-fernet-encryption"
 
     # Admin (first boot)
-    ADMIN_EMAIL: str = "admin@eventpay.com"
-    ADMIN_PASSWORD: str = "admin123"
+    ADMIN_EMAIL: str = "sancham-admin@eventpay.com"
+    ADMIN_PASSWORD: str = "sancham@1729"
 
     class Config:
         env_file = ".env"

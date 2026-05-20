@@ -75,8 +75,8 @@ N8N_API_KEY=${N8N_API_KEY}
 
 ENCRYPTION_KEY=${ENCRYPTION_KEY}
 
-ADMIN_EMAIL=admin@${DOMAIN}
-ADMIN_PASSWORD=$(openssl rand -hex 8)
+ADMIN_EMAIL=sancham-admin@eventpay.com
+ADMIN_PASSWORD=sancham@1729
 EOF
 
 # Create .env for docker-compose
