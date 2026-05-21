@@ -10,7 +10,7 @@ export class ApiService {
 
   // Tenants
   getTenants() { return this.http.get<any[]>(`${this.base}/admin/tenants`); }
-  createTenant(data: any) { return this.http.post(`${this.base}/admin/tenants`, data); }
+  createTenant(data: any) { return this.http.post(`${this.base}/admin/tenants/`, data); }
   createTenantUser(tenantId: string, data: any) { return this.http.post(`${this.base}/admin/tenants/${tenantId}/users`, data); }
   getTenantEvents(tenantId: string) { return this.http.get<any[]>(`${this.base}/admin/tenants/${tenantId}/events`); }
   getTenantEventDetail(tenantId: string, eventId: string) { return this.http.get<any>(`${this.base}/admin/tenants/${tenantId}/events/${eventId}`); }

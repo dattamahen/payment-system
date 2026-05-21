@@ -48,7 +48,7 @@ async def lifespan(app: FastAPI):
 
 from starlette.middleware.base import BaseHTTPMiddleware
 
-app = FastAPI(title=settings.APP_NAME, lifespan=lifespan)
+app = FastAPI(title=settings.APP_NAME, lifespan=lifespan, redirect_slashes=False)
 
 app.add_middleware(
     CORSMiddleware,
