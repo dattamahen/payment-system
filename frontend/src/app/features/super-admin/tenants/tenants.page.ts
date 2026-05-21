@@ -15,7 +15,7 @@ import { AuthService } from '../../../core/services/auth.service';
   styleUrls: ['./tenants.page.scss'],
 })
 export class TenantsPage implements OnInit, ViewWillEnter {
-  view: 'list' | 'events' | 'event-detail' = 'list';
+  view: 'list' | 'events' | 'event-detail' | 'edit' = 'list';
   tenants: any[] = [];
   selectedTenant: any = null;
   selectedTenantForUser: any = null;
@@ -23,6 +23,9 @@ export class TenantsPage implements OnInit, ViewWillEnter {
   eventDetail: any = null;
   newUser = { name: '', email: '', password: '', role: 'tenant_admin' };
   userMsg = '';
+  editTenant: any = null;
+  editMsg = '';
+  editErr = false;
 
   constructor(private api: ApiService, private auth: AuthService, private router: Router) {}
 
@@ -31,13 +34,15 @@ export class TenantsPage implements OnInit, ViewWillEnter {
   ionViewWillEnter() { this.loadTenants(); }
 
   getTitle(): string {
+    if (this.view === 'edit') return 'Edit Tenant: ' + (this.editTenant?.name || '');
     if (this.view === 'event-detail') return this.eventDetail?.name || 'Event Detail';
     if (this.view === 'events') return this.selectedTenant?.name + ' - Events';
     return 'Tenants';
   }
 
   goBack() {
-    if (this.view === 'event-detail') { this.view = 'events'; this.eventDetail = null; }
+    if (this.view === 'edit') { this.view = 'list'; this.editTenant = null; this.editMsg = ''; }
+    else if (this.view === 'event-detail') { this.view = 'events'; this.eventDetail = null; }
     else if (this.view === 'events') { this.view = 'list'; this.tenantEvents = []; }
   }
 
@@ -59,6 +64,36 @@ export class TenantsPage implements OnInit, ViewWillEnter {
   viewTenantEvents(t: any) {
     this.selectedTenant = t;
     this.api.getTenantEvents(t.id).subscribe(events => { this.tenantEvents = events; this.view = 'events'; });
+  }
+
+  openEditTenant(t: any) {
+    this.editTenant = { ...t, config: { whatsapp_number: '', whatsapp_phone_number_id: '', whatsapp_api_key: '', razorpay_key_id: '', razorpay_key_secret: '' } };
+    this.editMsg = '';
+    this.editErr = false;
+    this.view = 'edit';
+  }
+
+  saveEditTenant() {
+    const payload: any = { name: this.editTenant.name };
+    const config: any = {};
+    if (this.editTenant.config.whatsapp_number) config.whatsapp_number = this.editTenant.config.whatsapp_number;
+    if (this.editTenant.config.whatsapp_phone_number_id) config.whatsapp_phone_number_id = this.editTenant.config.whatsapp_phone_number_id;
+    if (this.editTenant.config.whatsapp_api_key) config.whatsapp_api_key = this.editTenant.config.whatsapp_api_key;
+    if (this.editTenant.config.razorpay_key_id) config.razorpay_key_id = this.editTenant.config.razorpay_key_id;
+    if (this.editTenant.config.razorpay_key_secret) config.razorpay_key_secret = this.editTenant.config.razorpay_key_secret;
+    if (Object.keys(config).length) payload.config = config;
+    this.api.updateTenant(this.editTenant.id, payload).subscribe({
+      next: () => { this.editMsg = 'Tenant updated!'; this.editErr = false; this.loadTenants(); },
+      error: (e) => { this.editMsg = e.error?.detail || 'Failed'; this.editErr = true; }
+    });
+  }
+
+  activateTenant(t: any) {
+    this.api.updateTenant(t.id, { status: 'active' }).subscribe(() => this.loadTenants());
+  }
+
+  deactivateTenant(t: any) {
+    this.api.updateTenant(t.id, { status: 'inactive' }).subscribe(() => this.loadTenants());
   }
 
   getEventStatusColor(status: string): string {

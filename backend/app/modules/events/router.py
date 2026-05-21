@@ -8,7 +8,7 @@ router = APIRouter()
 
 
 @router.post("/", response_model=EventResponse)
-async def create_event(body: EventCreate, tenant_id: str = Depends(TenantContext.get_tenant_id)):
+async def create_event(body: EventCreate, tenant_id: str = Depends(TenantContext.get_active_tenant_id)):
     return await EventService.create(tenant_id, body)
 
 

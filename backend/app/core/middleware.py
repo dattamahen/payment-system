@@ -39,3 +39,16 @@ class TenantContext:
         if not tenant_id and user.get("role") != "super_admin":
             raise HTTPException(status_code=403, detail="No tenant associated")
         return tenant_id
+
+    @staticmethod
+    async def get_active_tenant_id(user=Depends(get_current_user)) -> str:
+        """Same as get_tenant_id but also checks tenant is active."""
+        tenant_id = user.get("tenant_id")
+        if not tenant_id and user.get("role") != "super_admin":
+            raise HTTPException(status_code=403, detail="No tenant associated")
+        if tenant_id:
+            db = await get_db()
+            tenant = await db.tenants.find_one({"_id": ObjectId(tenant_id)})
+            if not tenant or tenant.get("status") != "active":
+                raise HTTPException(status_code=403, detail="Tenant is inactive. Cannot create events.")
+        return tenant_id

@@ -34,8 +34,11 @@
                 <td>{{ t.name }}</td>
                 <td><ion-badge [color]="t.status === 'active' ? 'success' : 'danger'">{{ t.status }}</ion-badge></td>
                 <td class="actions-cell">
+                  <ion-button fill="clear" size="small" (click)="openEditTenant(t)">Edit</ion-button>
                   <ion-button fill="clear" size="small" (click)="viewTenantEvents(t)">Events</ion-button>
                   <ion-button fill="clear" size="small" (click)="selectTenantForUser(t)">Add User</ion-button>
+                  <ion-button *ngIf="t.status === 'active'" fill="clear" size="small" color="danger" (click)="deactivateTenant(t)">Deactivate</ion-button>
+                  <ion-button *ngIf="t.status !== 'active'" fill="clear" size="small" color="success" (click)="activateTenant(t)">Activate</ion-button>
                 </td>
               </tr>
             </tbody>
@@ -51,8 +54,11 @@
             <ion-badge [color]="t.status === 'active' ? 'success' : 'danger'">{{ t.status }}</ion-badge>
           </div>
           <div class="mobile-card-actions">
+            <ion-button fill="outline" size="small" (click)="openEditTenant(t)">Edit</ion-button>
             <ion-button fill="outline" size="small" (click)="viewTenantEvents(t)">Events</ion-button>
             <ion-button fill="outline" size="small" (click)="selectTenantForUser(t)">Add User</ion-button>
+            <ion-button *ngIf="t.status === 'active'" fill="outline" size="small" color="danger" (click)="deactivateTenant(t)">Deactivate</ion-button>
+            <ion-button *ngIf="t.status !== 'active'" fill="outline" size="small" color="success" (click)="activateTenant(t)">Activate</ion-button>
           </div>
         </div>
       </div>
@@ -197,6 +203,40 @@
           <div *ngIf="!eventDetail.registrations?.length" class="empty-state"><p>No registrations yet.</p></div>
         </ion-card-content>
       </ion-card>
+    </ng-container>
+
+    <!-- EDIT TENANT -->
+    <ng-container *ngIf="view === 'edit' && editTenant">
+      <ion-card>
+        <ion-card-header><ion-card-title>Tenant Details</ion-card-title></ion-card-header>
+        <ion-card-content>
+          <ion-item><ion-input label="Name" labelPlacement="stacked" [(ngModel)]="editTenant.name"></ion-input></ion-item>
+          <ion-item><ion-input label="Slug" labelPlacement="stacked" [value]="editTenant.slug" disabled></ion-input></ion-item>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card>
+        <ion-card-header><ion-card-title>WhatsApp Config</ion-card-title></ion-card-header>
+        <ion-card-content>
+          <p class="config-hint">Leave blank to keep existing values.</p>
+          <ion-item><ion-input label="WhatsApp Display Number" labelPlacement="stacked" [(ngModel)]="editTenant.config.whatsapp_number" placeholder="+919876543210"></ion-input></ion-item>
+          <ion-item><ion-input label="Phone Number ID" labelPlacement="stacked" [(ngModel)]="editTenant.config.whatsapp_phone_number_id" placeholder="107326073254xxxx"></ion-input></ion-item>
+          <ion-item><ion-input label="Access Token" labelPlacement="stacked" type="password" [(ngModel)]="editTenant.config.whatsapp_api_key" placeholder="Leave blank to keep current"></ion-input></ion-item>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card>
+        <ion-card-header><ion-card-title>Payment Config (Razorpay)</ion-card-title></ion-card-header>
+        <ion-card-content>
+          <p class="config-hint">Leave blank to keep existing values.</p>
+          <ion-item><ion-input label="Razorpay Key ID" labelPlacement="stacked" [(ngModel)]="editTenant.config.razorpay_key_id" placeholder="rzp_live_xxxxxxxx"></ion-input></ion-item>
+          <ion-item><ion-input label="Razorpay Key Secret" labelPlacement="stacked" type="password" [(ngModel)]="editTenant.config.razorpay_key_secret" placeholder="Leave blank to keep current"></ion-input></ion-item>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-button expand="block" class="ion-margin-top" (click)="saveEditTenant()">Save Changes</ion-button>
+      <ion-button expand="block" fill="clear" (click)="goBack()">Cancel</ion-button>
+      <p *ngIf="editMsg" [class]="editErr ? 'error-msg' : 'success-msg'">{{ editMsg }}</p>
     </ng-container>
 
   </div>
