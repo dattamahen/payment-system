@@ -13,9 +13,10 @@ async def create_order(body: CreateOrderRequest, tenant_id: str = Depends(Tenant
 
 @router.post("/webhook")
 async def payment_webhook(request: Request):
-    """Razorpay webhook - verifies signature and updates registration."""
+    """Razorpay webhook - called when payment is captured."""
     body = await request.json()
-    return await PaymentService.handle_webhook(body)
+    signature = request.headers.get("X-Razorpay-Signature")
+    return await PaymentService.handle_webhook(body, signature)
 
 
 @router.get("/{registration_id}")

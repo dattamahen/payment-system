@@ -165,7 +165,7 @@ class N8nService:
 
     @staticmethod
     async def create_payment_link(tenant_id: str, event_id: str, registration_id: str, phone: str):
-        """Creates a UPI-only Razorpay payment link for n8n to send via WhatsApp."""
+        """Creates a Razorpay payment link for n8n to send via WhatsApp."""
         import razorpay
 
         main_db = await get_db()
@@ -184,20 +184,20 @@ class N8nService:
         client = razorpay.Client(auth=(key_id, key_secret))
 
         amount = event["pricing"]["amount"] * 100  # Razorpay expects paise
-        payment_link = client.payment_link.create({
-            "upi_link": True,
+        payment_link_data = {
             "amount": amount,
             "currency": event["pricing"].get("currency", "INR"),
             "description": f"Registration: {event['name']}",
             "customer": {"contact": phone},
             "notify": {"sms": False, "email": False},
-            "expire_by": int((datetime.utcnow().timestamp()) + 3600),  # 1 hour expiry
+            "expire_by": int(__import__('time').time()) + 7200,  # 2 hours from now
             "notes": {
                 "tenant_id": tenant_id,
                 "event_id": event_id,
                 "registration_id": registration_id,
             },
-        })
+        }
+        payment_link = client.payment_link.create(payment_link_data)
 
         # Update registration with payment info
         await db.registrations.update_one(
