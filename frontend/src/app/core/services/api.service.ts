@@ -9,13 +9,13 @@ export class ApiService {
   constructor(private http: HttpClient) {}
 
   // Tenants
-  getTenants() { return this.http.get<any[]>(`${this.base}/admin/tenants`); }
+  getTenants() { return this.http.get<any[]>(`${this.base}/admin/tenants/`); }
   createTenant(data: any) { return this.http.post(`${this.base}/admin/tenants/`, data); }
-  createTenantUser(tenantId: string, data: any) { return this.http.post(`${this.base}/admin/tenants/${tenantId}/users`, data); }
-  getTenantEvents(tenantId: string) { return this.http.get<any[]>(`${this.base}/admin/tenants/${tenantId}/events`); }
-  getTenantEventDetail(tenantId: string, eventId: string) { return this.http.get<any>(`${this.base}/admin/tenants/${tenantId}/events/${eventId}`); }
+  createTenantUser(tenantId: string, data: any) { return this.http.post(`${this.base}/admin/tenants/${tenantId}/users/`, data); }
+  getTenantEvents(tenantId: string) { return this.http.get<any[]>(`${this.base}/admin/tenants/${tenantId}/events/`); }
+  getTenantEventDetail(tenantId: string, eventId: string) { return this.http.get<any>(`${this.base}/admin/tenants/${tenantId}/events/${eventId}/`); }
   changeTenantEventStatus(tenantId: string, eventId: string, status: string) { return this.http.patch(`${this.base}/admin/tenants/${tenantId}/events/${eventId}/status?status=${status}`, {}); }
-  updateTenant(id: string, data: any) { return this.http.patch(`${this.base}/admin/tenants/${id}`, data); }
+  updateTenant(id: string, data: any) { return this.http.patch(`${this.base}/admin/tenants/${id}/`, data); }
 
   // Events
   getEvents() { return this.http.get<any[]>(`${this.base}/events`); }
