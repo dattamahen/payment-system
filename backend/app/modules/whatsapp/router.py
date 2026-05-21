@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, Depends, HTTPException
+from fastapi import APIRouter, Request, Depends, HTTPException, Query
 import httpx
 from app.config import get_settings
 from app.modules.whatsapp.flow_engine import FlowEngine
@@ -9,8 +9,11 @@ router = APIRouter()
 
 
 @router.get("/webhook")
-async def verify_webhook(hub_mode: str = "", hub_verify_token: str = "", hub_challenge: str = ""):
+async def verify_webhook(request: Request):
     """WhatsApp webhook verification endpoint."""
+    hub_mode = request.query_params.get("hub.mode", "")
+    hub_verify_token = request.query_params.get("hub.verify_token", "")
+    hub_challenge = request.query_params.get("hub.challenge", "")
     if hub_mode == "subscribe" and hub_verify_token == settings.WHATSAPP_VERIFY_TOKEN:
         return int(hub_challenge)
     raise HTTPException(status_code=403, detail="Verification failed")
