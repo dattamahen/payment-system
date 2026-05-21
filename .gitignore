@@ -1,8 +1,8 @@
 # Environment & secrets
-.env
+backend/.env
+backend/.env.prod
 *.pem
 *.key
-backend/.env.prod
 nginx/ssl/
 
 # Python
