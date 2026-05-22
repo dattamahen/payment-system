@@ -25,6 +25,7 @@ export class ApiService {
   changeEventStatus(id: string, status: string) { return this.http.patch(`${this.base}/events/${id}/status?status=${status}`, {}); }
   getEventRegistrations(eventId: string) { return this.http.get<any[]>(`${this.base}/events/${eventId}/registrations/`); }
   generateQR(eventId: string) { return this.http.post(`${this.base}/events/${eventId}/generate-qr/`, {}); }
+  downloadExcel(eventId: string) { return this.http.get(`${this.base}/events/${eventId}/registrations/excel/`, { responseType: 'blob' }); }
 
   // Forms
   getForms() { return this.http.get<any[]>(`${this.base}/forms/`); }

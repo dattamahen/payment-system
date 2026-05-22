@@ -104,7 +104,61 @@ class EventService:
         return [{"id": str(r["_id"]), "phone": r.get("phone"), "responses": r.get("responses", {}), "payment": r.get("payment", {}), "status": r.get("status"), "created_at": r.get("created_at")} for r in registrations]
 
     @staticmethod
-    async def generate_pdf(event_id: str, tenant_id: str):
+    async def generate_excel(event_id: str, tenant_id: str):
+        from io import BytesIO
+        from openpyxl import Workbook
+        from openpyxl.styles import Font, PatternFill, Alignment
+        from fastapi.responses import StreamingResponse
+
+        db = await get_tenant_db(tenant_id)
+        event = await db.events.find_one({"_id": ObjectId(event_id)})
+        if not event:
+            raise HTTPException(status_code=404, detail="Event not found")
+
+        registrations = await db.registrations.find({"event_id": event_id}).sort("created_at", -1).to_list(5000)
+        form_fields = event.get("form_fields") or []
+
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "Registrations"
+
+        # Headers
+        headers = ["#", "Phone"] + [f["label"] for f in form_fields] + ["Payment Status", "Status", "Registered At"]
+        header_font = Font(bold=True, color="FFFFFF")
+        header_fill = PatternFill(start_color="1a56db", end_color="1a56db", fill_type="solid")
+
+        for col, h in enumerate(headers, 1):
+            cell = ws.cell(row=1, column=col, value=h)
+            cell.font = header_font
+            cell.fill = header_fill
+            cell.alignment = Alignment(horizontal="center")
+
+        # Data rows
+        for i, r in enumerate(registrations, 1):
+            row = [i, r.get("phone", "-")]
+            for f in form_fields:
+                row.append(r.get("responses", {}).get(f["label"], "-"))
+            row.append(r.get("payment", {}).get("status", "-"))
+            row.append(r.get("status", "-"))
+            row.append(str(r.get("created_at", "-")))
+            for col, val in enumerate(row, 1):
+                ws.cell(row=i + 1, column=col, value=val)
+
+        # Auto-width columns
+        for col in ws.columns:
+            max_len = max(len(str(cell.value or "")) for cell in col)
+            ws.column_dimensions[col[0].column_letter].width = min(max_len + 2, 40)
+
+        buffer = BytesIO()
+        wb.save(buffer)
+        buffer.seek(0)
+
+        filename = f"{event['slug']}_registrations.xlsx"
+        return StreamingResponse(
+            buffer,
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={"Content-Disposition": f'attachment; filename="{filename}"'}
+        )
         from io import BytesIO
         from reportlab.lib.pagesizes import A4
         from reportlab.lib import colors

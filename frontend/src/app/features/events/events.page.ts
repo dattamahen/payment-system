@@ -51,8 +51,20 @@ export class EventsPage implements OnInit, ViewWillEnter {
 
   downloadPdf() {
     const token = this.auth.getToken();
-    const url = `http://localhost:8000/api/v1/events/${this.selectedEvent.id}/registrations/download?token=${token}`;
+    const url = `/api/v1/events/${this.selectedEvent.id}/registrations/download?token=${token}`;
     window.open(url, '_blank');
+  }
+
+  downloadExcel() {
+    if (!this.selectedEvent) return;
+    this.api.downloadExcel(this.selectedEvent.id).subscribe((blob: any) => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${this.selectedEvent.name}_registrations.xlsx`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    });
   }
 
   goToCreate() { this.router.navigate(['/dashboard/events/create']); }

@@ -176,7 +176,10 @@
       </ion-card>
 
       <ion-card>
-        <ion-card-header><ion-card-title>Registrations ({{ eventDetail.registrations_count }})</ion-card-title></ion-card-header>
+        <ion-card-header>
+          <ion-card-title>Registrations ({{ eventDetail.registrations_count }})</ion-card-title>
+          <ion-button *ngIf="eventDetail.registrations?.length" fill="outline" size="small" (click)="downloadExcel()">Download Excel</ion-button>
+        </ion-card-header>
         <ion-card-content>
           <div class="data-table-wrap" *ngIf="eventDetail.registrations?.length">
             <table class="data-table">

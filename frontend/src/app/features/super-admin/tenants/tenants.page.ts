@@ -119,4 +119,16 @@ export class TenantsPage implements OnInit, ViewWillEnter {
     if (!responses) return '-';
     return Object.entries(responses).map(([k, v]) => `${k}: ${v}`).join(' | ');
   }
+
+  downloadExcel() {
+    if (!this.eventDetail) return;
+    this.api.downloadExcel(this.eventDetail.id).subscribe((blob: any) => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${this.eventDetail.name}_registrations.xlsx`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    });
+  }
 }
