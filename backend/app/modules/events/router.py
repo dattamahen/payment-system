@@ -62,5 +62,8 @@ async def download_pdf_public(event_id: str, token: str):
 
 
 @router.get("/{event_id}/registrations/excel")
-async def download_excel(event_id: str, tenant_id: str = Depends(TenantContext.get_tenant_id)):
-    return await EventService.generate_excel(event_id, tenant_id)
+async def download_excel(event_id: str, tenant_id: str = None, user=Depends(require_tenant_admin)):
+    tid = tenant_id or user.get("tenant_id")
+    if not tid:
+        raise HTTPException(status_code=400, detail="tenant_id required")
+    return await EventService.generate_excel(event_id, tid)

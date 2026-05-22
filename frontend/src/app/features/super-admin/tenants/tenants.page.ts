@@ -121,8 +121,8 @@ export class TenantsPage implements OnInit, ViewWillEnter {
   }
 
   downloadExcel() {
-    if (!this.eventDetail) return;
-    this.api.downloadExcel(this.eventDetail.id).subscribe((blob: any) => {
+    if (!this.eventDetail || !this.selectedTenant) return;
+    this.api.downloadExcel(this.eventDetail.id, this.selectedTenant.id).subscribe((blob: any) => {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
