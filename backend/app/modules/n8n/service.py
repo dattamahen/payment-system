@@ -256,6 +256,11 @@ class N8nService:
         session_raw = await redis.get(session_key)
         session = json.loads(session_raw) if session_raw else None
 
+        # If user sends a greeting while in a session, auto-reset and start fresh
+        if session and text.strip().lower() in ('hi', 'hello', 'hey', 'start', 'restart'):
+            await redis.delete(session_key)
+            session = None
+
         # Resolve tenant from WhatsApp number (match by phone_number_id or display number)
         db = await get_db()
         tenant = await db.tenants.find_one({
