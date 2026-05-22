@@ -1,52 +1,62 @@
-.input-row,
-.field-row {
+.input-row {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 0;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
 
-  @media (min-width: 768px) {
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
   }
 }
 
 .field-block {
-  border: 1px solid #e2e8f0;
-  padding: 12px 16px;
+  background: #f9fafb;
+  border-radius: 14px;
+  padding: 16px;
   margin-bottom: 12px;
-  border-radius: 10px;
-  background: #f8fafc;
+  border: 1px solid #f3f4f6;
 }
 
 .field-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
 }
 
 .field-num {
-  font-size: 12px;
-  font-weight: 600;
-  color: #64748b;
-  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 13px;
+  color: #6366f1;
+  background: #eef2ff;
+  padding: 4px 10px;
+  border-radius: 8px;
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
 }
 
 .submit-btn {
-  margin-top: 16px;
-  --padding-top: 14px;
-  --padding-bottom: 14px;
+  margin-top: 24px;
+  --background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  font-weight: 700;
   font-size: 16px;
-  font-weight: 600;
+  --padding-top: 16px;
+  --padding-bottom: 16px;
 }
 
 .msg {
   text-align: center;
-  margin-top: 12px;
   font-size: 14px;
-  color: #16a34a;
+  margin-top: 12px;
+  font-weight: 500;
+  color: #059669;
 
-  &.error {
-    color: #dc2626;
-  }
+  &.error { color: #dc2626; }
 }

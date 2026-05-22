@@ -9,8 +9,17 @@
 
 .success-msg {
   text-align: center;
-  color: #16a34a;
+  color: #059669;
   font-size: 13px;
+  font-weight: 500;
+  margin-top: 8px;
+}
+
+.error-msg {
+  text-align: center;
+  color: #dc2626;
+  font-size: 13px;
+  font-weight: 500;
   margin-top: 8px;
 }
 
@@ -28,38 +37,37 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 0;
-  border-bottom: 1px solid #f1f5f9;
+  padding: 12px 0;
+  border-bottom: 1px solid #f3f4f6;
   font-size: 14px;
 
-  &:last-child {
-    border-bottom: none;
-  }
+  &:last-child { border-bottom: none; }
 }
 
 .detail-label {
-  font-weight: 500;
-  color: #64748b;
-  font-size: 13px;
+  font-weight: 600;
+  color: #6b7280;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
 }
 
 .question-item {
-  padding: 10px 0;
-  border-bottom: 1px solid #f1f5f9;
+  padding: 12px 0;
+  border-bottom: 1px solid #f3f4f6;
   font-size: 14px;
   display: flex;
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
 
-  &:last-child {
-    border-bottom: none;
-  }
+  &:last-child { border-bottom: none; }
 }
 
 .q-num {
-  font-weight: 600;
-  color: #64748b;
+  font-weight: 700;
+  color: #6366f1;
+  font-size: 13px;
 }
 
 .responses-cell {
@@ -67,4 +75,10 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.config-hint {
+  font-size: 12px;
+  color: #9ca3af;
+  margin: 0 0 12px;
 }

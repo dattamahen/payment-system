@@ -1,26 +1,16 @@
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 16px;
-
-  @media (min-width: 768px) {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
 .config-hint {
   font-size: 12px;
-  color: #64748b;
+  color: #9ca3af;
   margin: 0 0 12px;
+  line-height: 1.4;
 }
 
 .msg {
   text-align: center;
-  margin-top: 12px;
   font-size: 14px;
-  color: #16a34a;
+  margin-top: 12px;
+  font-weight: 500;
+  color: #059669;
 
-  &.error {
-    color: #dc2626;
-  }
+  &.error { color: #dc2626; }
 }

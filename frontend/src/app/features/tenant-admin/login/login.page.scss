@@ -9,7 +9,11 @@ ion-toolbar {
 }
 
 ion-content {
-  --background: linear-gradient(135deg, #1a56db 0%, #7c3aed 100%);
+  --background: #fafafa;
+
+  @media (max-width: 959px) {
+    --background: #ffffff;
+  }
 }
 
 .login-wrapper {
@@ -21,17 +25,16 @@ ion-content {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 24px 16px;
+    padding: 32px 24px;
     min-height: calc(100vh - 56px);
   }
 }
 
-// Left side - branded background (desktop only)
 .login-bg {
   display: none;
   position: relative;
   flex: 1;
-  background: linear-gradient(135deg, #1a56db 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
   overflow: hidden;
 
   @media (min-width: 960px) {
@@ -44,7 +47,7 @@ ion-content {
 .bg-pattern {
   position: absolute;
   inset: 0;
-  opacity: 0.08;
+  opacity: 0.06;
   background-image:
     radial-gradient(circle at 25% 25%, #fff 2px, transparent 2px),
     radial-gradient(circle at 75% 75%, #fff 1.5px, transparent 1.5px);
@@ -54,7 +57,7 @@ ion-content {
 .bg-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.15) 100%);
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.1) 100%);
 }
 
 .bg-content {
@@ -65,36 +68,37 @@ ion-content {
   max-width: 480px;
 
   h1 {
-    font-size: 36px;
-    font-weight: 700;
+    font-size: 40px;
+    font-weight: 800;
     margin: 0 0 12px;
-    letter-spacing: -0.5px;
+    letter-spacing: -1px;
   }
 
   p {
-    font-size: 16px;
+    font-size: 17px;
     opacity: 0.9;
-    margin: 0 0 32px;
-    line-height: 1.5;
+    margin: 0 0 36px;
+    line-height: 1.6;
+    font-weight: 300;
   }
 }
 
 .features {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
 .feature-item {
   font-size: 14px;
-  padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.12);
-  border-radius: 10px;
-  backdrop-filter: blur(4px);
+  padding: 14px 18px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.15);
+  font-weight: 500;
 }
 
-// Right side - form
 .login-form-section {
   display: flex;
   align-items: center;
@@ -102,54 +106,65 @@ ion-content {
   width: 100%;
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, #1a56db 0%, #7c3aed 100%);
 
   @media (min-width: 960px) {
     max-width: 520px;
     flex: none;
     width: 520px;
     padding: 24px;
-
-    .mobile-pattern {
-      display: block;
-    }
+    background: #fafafa;
   }
 }
 
 .mobile-pattern {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
+  display: none;
 }
 
 .login-form-inner {
   width: 100%;
-  max-width: 400px;
+  max-width: 380px;
   position: relative;
   z-index: 1;
 
   ion-card {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: none;
+    border: 1px solid #e5e7eb;
     margin: 0;
+    border-radius: 16px;
+
+    @media (min-width: 960px) {
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+      border: none;
+    }
+  }
+
+  ion-card-title {
+    font-size: 22px;
+    font-weight: 700;
+    text-align: center;
   }
 }
 
-// Mobile branding
 .brand-mobile {
   text-align: center;
-  margin-bottom: 24px;
+  margin-bottom: 32px;
 
   h2 {
-    font-size: 28px;
-    font-weight: 700;
-    color: #fff;
-    margin: 0 0 4px;
+    font-size: 32px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #6366f1, #ec4899);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0 0 6px;
+    letter-spacing: -0.5px;
   }
 
   p {
     font-size: 14px;
-    color: rgba(255, 255, 255, 0.8);
+    color: #6b7280;
     margin: 0;
+    font-weight: 400;
   }
 
   @media (min-width: 960px) {
@@ -162,4 +177,5 @@ ion-content {
   text-align: center;
   font-size: 13px;
   margin-top: 12px;
+  font-weight: 500;
 }
