@@ -186,19 +186,19 @@
               <thead>
                 <tr>
                   <th>#</th>
-                  <th>Contact</th>
-                  <th>Status</th>
+                  <th>Phone</th>
+                  <th *ngFor="let f of eventDetail.form_fields">{{ f.label }}</th>
                   <th>Payment</th>
-                  <th>Responses</th>
+                  <th>Status</th>
                 </tr>
               </thead>
               <tbody>
                 <tr *ngFor="let r of eventDetail.registrations; let i = index">
                   <td>{{ i + 1 }}</td>
                   <td>{{ r.phone || '-' }}</td>
-                  <td>{{ r.status }}</td>
-                  <td>{{ r.payment?.status || 'N/A' }}</td>
-                  <td class="responses-cell">{{ formatResponses(r.responses) }}</td>
+                  <td *ngFor="let f of eventDetail.form_fields">{{ r.responses[f.label] || '-' }}</td>
+                  <td><ion-badge [color]="r.payment?.status === 'paid' ? 'success' : 'warning'">{{ r.payment?.status || 'N/A' }}</ion-badge></td>
+                  <td><ion-badge [color]="r.status === 'completed' ? 'success' : 'warning'">{{ r.status }}</ion-badge></td>
                 </tr>
               </tbody>
             </table>
