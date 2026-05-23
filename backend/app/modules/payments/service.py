@@ -92,6 +92,32 @@ class PaymentService:
                     "status": "completed",
                 }}
             )
+
+            # Send WhatsApp confirmation
+            reg = await tenant_db.registrations.find_one({"_id": ObjectId(registration_id)})
+            tenant = await db.tenants.find_one({"_id": ObjectId(tenant_id)})
+            if reg and tenant and tenant.get("config", {}).get("whatsapp_api_key"):
+                phone = reg.get("phone")
+                amount = entity.get("amount", 0) / 100
+                phone_number_id = tenant["config"].get("whatsapp_phone_number_id", "")
+                api_key = decrypt_secret(tenant["config"]["whatsapp_api_key"])
+                import httpx
+                from app.config import get_settings
+                settings = get_settings()
+                url = f"{settings.WHATSAPP_API_URL}/{phone_number_id}/messages"
+                headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
+                wa_payload = {
+                    "messaging_product": "whatsapp",
+                    "to": phone,
+                    "type": "text",
+                    "text": {"body": f"\u2705 Payment of \u20b9{amount:.0f} received! Your registration is confirmed. Thank you!"}
+                }
+                try:
+                    async with httpx.AsyncClient() as client:
+                        await client.post(url, json=wa_payload, headers=headers)
+                except Exception:
+                    pass
+
             await db.webhook_logs.update_one(
                 {"payload": payload, "processed": False},
                 {"$set": {"processed": True}}
