@@ -333,8 +333,6 @@ class N8nService:
                     msg += f"\U0001f4b0 *Fee:* {fee_desc}\n"
                 elif pricing.get("description"):
                     msg += f"\U0001f4b0 *Fee:* {pricing['description']}\n"
-                else:
-                    msg += f"\U0001f4b0 *Fee:* Free\n"
                 msg += f"\n---\n\nPlease answer the following to register:\n\n"
                 q = form_fields[0]
                 msg += f"*Q1:* {q['label']}"
