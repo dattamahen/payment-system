@@ -313,8 +313,28 @@ class N8nService:
                 }
                 await redis.set(session_key, json.dumps(session), ex=3600)
 
+                # Build welcome message with venue details
+                venue = event.get("venue") or {}
+                msg = f"\U0001f3c6 *{event['name']}*\n\n"
+                if venue.get("name"):
+                    msg += f"\U0001f4cd *Venue:* {venue['name']}\n"
+                if venue.get("address"):
+                    msg += f"{venue['address']}"
+                    if venue.get("city"):
+                        msg += f", {venue['city']}"
+                    msg += "\n"
+                if venue.get("map_url"):
+                    msg += f"\U0001f5fa *Map:* {venue['map_url']}\n"
+                if event.get("event_date"):
+                    msg += f"\U0001f4c5 *Date:* {event['event_date']}\n"
+                pricing = event.get("pricing", {})
+                if pricing.get("type") == "paid":
+                    msg += f"\U0001f4b0 *Fee:* \u20b9{pricing.get('amount', 0)}\n"
+                else:
+                    msg += f"\U0001f4b0 *Fee:* Free\n"
+                msg += f"\n---\n\nPlease answer the following to register:\n\n"
                 q = form_fields[0]
-                msg = f"Welcome! Registering for {event['name']}. Please answer: {q['label']}"
+                msg += f"*Q1:* {q['label']}"
                 if q.get("options"):
                     msg += " (Options: " + ", ".join(q["options"]) + ")"
                 return {"action": "reply", "message": msg}
