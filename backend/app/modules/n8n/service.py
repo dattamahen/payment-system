@@ -329,7 +329,10 @@ class N8nService:
                     msg += f"\U0001f4c5 *Date:* {event['event_date']}\n"
                 pricing = event.get("pricing", {})
                 if pricing.get("type") == "paid":
-                    msg += f"\U0001f4b0 *Fee:* \u20b9{pricing.get('amount', 0)}\n"
+                    fee_desc = pricing.get("description") or f"\u20b9{pricing.get('amount', 0)}"
+                    msg += f"\U0001f4b0 *Fee:* {fee_desc}\n"
+                elif pricing.get("description"):
+                    msg += f"\U0001f4b0 *Fee:* {pricing['description']}\n"
                 else:
                     msg += f"\U0001f4b0 *Fee:* Free\n"
                 msg += f"\n---\n\nPlease answer the following to register:\n\n"

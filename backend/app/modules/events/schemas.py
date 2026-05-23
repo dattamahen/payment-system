@@ -7,6 +7,7 @@ class Pricing(BaseModel):
     type: str = "free"  # free | paid | tiered
     amount: Optional[int] = None
     currency: str = "INR"
+    description: Optional[str] = None  # Custom fee text e.g. "₹1300 Per Team (2 members)"
     tiers: Optional[List[Dict[str, Any]]] = None
 
 
