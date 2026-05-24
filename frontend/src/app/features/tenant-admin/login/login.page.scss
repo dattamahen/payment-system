@@ -10,10 +10,6 @@ ion-toolbar {
 
 ion-content {
   --background: #fafafa;
-
-  @media (max-width: 959px) {
-    --background: #ffffff;
-  }
 }
 
 .login-wrapper {
@@ -23,18 +19,16 @@ ion-content {
 
   @media (max-width: 959px) {
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 32px 24px;
     min-height: calc(100vh - 56px);
   }
 }
 
+// Left side - content panel
 .login-bg {
   display: none;
   position: relative;
-  flex: 1;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+  flex: 1.4;
+  background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 40%, #ff6b35 100%);
   overflow: hidden;
 
   @media (min-width: 960px) {
@@ -44,20 +38,10 @@ ion-content {
   }
 }
 
-.bg-pattern {
-  position: absolute;
-  inset: 0;
-  opacity: 0.06;
-  background-image:
-    radial-gradient(circle at 25% 25%, #fff 2px, transparent 2px),
-    radial-gradient(circle at 75% 75%, #fff 1.5px, transparent 1.5px);
-  background-size: 60px 60px, 40px 40px;
-}
-
 .bg-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.1) 100%);
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
 }
 
 .bg-content {
@@ -65,66 +49,116 @@ ion-content {
   z-index: 1;
   padding: 48px;
   color: #fff;
-  max-width: 480px;
+  max-width: 580px;
+}
+
+.logo-section {
+  margin-bottom: 32px;
 
   h1 {
-    font-size: 40px;
+    font-size: 42px;
     font-weight: 800;
-    margin: 0 0 12px;
+    margin: 0 0 8px;
     letter-spacing: -1px;
   }
 
+  .tagline {
+    font-size: 16px;
+    opacity: 0.85;
+    margin: 0;
+    font-weight: 400;
+  }
+}
+
+.hero-text {
+  margin-bottom: 36px;
+
+  h2 {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0 0 12px;
+    line-height: 1.3;
+    letter-spacing: -0.3px;
+  }
+
   p {
-    font-size: 17px;
-    opacity: 0.9;
-    margin: 0 0 36px;
+    font-size: 15px;
+    opacity: 0.85;
+    margin: 0;
     line-height: 1.6;
-    font-weight: 300;
   }
 }
 
 .features {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
+  margin-bottom: 32px;
 }
 
 .feature-item {
-  font-size: 14px;
-  padding: 14px 18px;
-  background: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 18px;
+  background: rgba(255, 255, 255, 0.08);
   border-radius: 14px;
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  font-weight: 500;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+
+  .feature-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  strong {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  p {
+    font-size: 12px;
+    opacity: 0.8;
+    margin: 0;
+    line-height: 1.4;
+  }
 }
 
+.trust-section {
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+
+  p {
+    font-size: 13px;
+    opacity: 0.7;
+    margin: 0;
+    font-style: italic;
+  }
+}
+
+// Right side - login form
 .login-form-section {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
-  position: relative;
-  overflow: hidden;
+  padding: 32px 24px;
+  background: #ffffff;
 
   @media (min-width: 960px) {
-    max-width: 520px;
+    max-width: 460px;
     flex: none;
-    width: 520px;
-    padding: 24px;
-    background: #fafafa;
+    width: 460px;
+    box-shadow: -4px 0 24px rgba(0, 0, 0, 0.06);
   }
-}
-
-.mobile-pattern {
-  display: none;
 }
 
 .login-form-inner {
   width: 100%;
   max-width: 380px;
-  position: relative;
-  z-index: 1;
 
   ion-card {
     box-shadow: none;
@@ -133,18 +167,27 @@ ion-content {
     border-radius: 16px;
 
     @media (min-width: 960px) {
-      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
-      border: none;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+      border: 1px solid #f0f0f0;
     }
   }
 
   ion-card-title {
-    font-size: 22px;
+    font-size: 24px;
     font-weight: 700;
     text-align: center;
+    color: #1a1a2e;
   }
 }
 
+.login-subtitle {
+  text-align: center;
+  font-size: 14px;
+  color: #6b7280;
+  margin: 4px 0 0;
+}
+
+// Mobile branding
 .brand-mobile {
   text-align: center;
   margin-bottom: 32px;
@@ -152,7 +195,7 @@ ion-content {
   h2 {
     font-size: 32px;
     font-weight: 800;
-    background: linear-gradient(135deg, #6366f1, #ec4899);
+    background: linear-gradient(135deg, #1e3a5f, #ff6b35);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -164,12 +207,33 @@ ion-content {
     font-size: 14px;
     color: #6b7280;
     margin: 0;
-    font-weight: 400;
   }
 
   @media (min-width: 960px) {
     display: none;
   }
+}
+
+// Mobile features list
+.mobile-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 24px;
+  justify-content: center;
+
+  @media (min-width: 960px) {
+    display: none;
+  }
+}
+
+.mobile-feature {
+  font-size: 12px;
+  padding: 8px 12px;
+  background: #f8f9fa;
+  border-radius: 20px;
+  color: #4b5563;
+  font-weight: 500;
 }
 
 .error-msg {
